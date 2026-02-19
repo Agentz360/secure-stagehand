@@ -9,27 +9,31 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import type {
   ShutdownSupervisorConfig,
   ShutdownSupervisorHandle,
   ShutdownSupervisorMessage,
-} from "../types/private/shutdown";
+} from "../types/private/shutdown.js";
 import {
   ShutdownSupervisorResolveError,
   ShutdownSupervisorSpawnError,
-} from "../types/private/shutdownErrors";
+} from "../types/private/shutdownErrors.js";
 
 const READY_TIMEOUT_MS = 500;
+// Prefer import.meta.url — always correct per-module in ESM.
+// __dirname may be an incorrect polyfill in some tsx / loader configurations.
+const thisDir = path.dirname(fileURLToPath(import.meta.url));
 
 const resolveSupervisorScript = (): {
   command: string;
   args: string[];
 } | null => {
-  const jsPath = path.resolve(__dirname, "supervisor.js");
+  const jsPath = path.resolve(thisDir, "supervisor.js");
   if (fs.existsSync(jsPath)) {
     return { command: process.execPath, args: [jsPath] };
   }
-  const tsPath = path.resolve(__dirname, "supervisor.ts");
+  const tsPath = path.resolve(thisDir, "supervisor.ts");
   if (fs.existsSync(tsPath)) {
     return { command: process.execPath, args: ["--import", "tsx", tsPath] };
   }
@@ -48,7 +52,7 @@ export function startShutdownSupervisor(
   if (!resolved) {
     opts?.onError?.(
       new ShutdownSupervisorResolveError(
-        "Shutdown supervisor script missing (expected supervisor.js or supervisor.ts next to shutdown/supervisorClient).",
+        `Shutdown supervisor script missing (searched ${thisDir} for supervisor.js or supervisor.ts).`,
       ),
       "resolve",
     );

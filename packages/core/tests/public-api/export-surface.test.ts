@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import StagehandDefaultExport, * as Stagehand from "../../dist/index.js";
-import { publicErrorTypes } from "./public-error-types.test";
+import StagehandDefaultExport, * as Stagehand from "@browserbasehq/stagehand";
+import { publicErrorTypes } from "./public-error-types.test.js";
 
 // Type matcher guidelines:
 //
@@ -33,6 +33,7 @@ const publicApiShape = {
   connectToMCPServer: Stagehand.connectToMCPServer,
   default: StagehandDefaultExport,
   defaultExtractSchema: Stagehand.defaultExtractSchema,
+  getAISDKLanguageModel: Stagehand.getAISDKLanguageModel,
   getZodType: Stagehand.getZodType,
   injectUrls: Stagehand.injectUrls,
   isRunningInBun: Stagehand.isRunningInBun,

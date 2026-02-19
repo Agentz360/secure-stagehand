@@ -1,6 +1,6 @@
 import makeFetchCookie from "fetch-cookie";
-import { loadApiKeyFromEnv } from "../utils";
-import { STAGEHAND_VERSION } from "../version";
+import { loadApiKeyFromEnv } from "../utils.js";
+import { STAGEHAND_VERSION } from "../version.js";
 import {
   StagehandAPIError,
   StagehandAPIUnauthorizedError,
@@ -9,7 +9,7 @@ import {
   StagehandResponseParseError,
   StagehandServerError,
   ExperimentalNotConfiguredError,
-} from "./types/public";
+} from "./types/public/index.js";
 import type {
   Action,
   ActResult,
@@ -23,14 +23,14 @@ import type {
   ExtractOptions,
   ObserveOptions,
   Api,
-} from "./types/public";
+} from "./types/public/index.js";
 import type {
   SerializableResponse,
   AgentCacheTransferPayload,
-} from "./types/private";
-import type { ModelConfiguration } from "./types/public/model";
-import { toJsonSchema } from "./zodCompat";
-import type { StagehandZodSchema } from "./zodCompat";
+} from "./types/private/index.js";
+import type { ModelConfiguration } from "./types/public/model.js";
+import { toJsonSchema } from "./zodCompat.js";
+import type { StagehandZodSchema } from "./zodCompat.js";
 
 // =============================================================================
 // Client-specific types (can't be Zod schemas due to functions/Page objects)
@@ -439,7 +439,7 @@ export class StagehandAPIClient {
     }
 
     // Parse the API data into StagehandMetrics format
-    const apiData = data.data || {};
+    const apiData = (data as Api.ReplayResponse).data;
     const metrics: StagehandMetrics = {
       actPromptTokens: 0,
       actCompletionTokens: 0,
@@ -469,7 +469,7 @@ export class StagehandAPIClient {
     };
 
     // Parse pages and their actions
-    const pages = apiData.pages || [];
+    const pages = apiData?.pages || [];
     for (const page of pages) {
       const actions = page.actions || [];
       for (const action of actions) {
@@ -480,8 +480,20 @@ export class StagehandAPIClient {
         if (tokenUsage) {
           const inputTokens = tokenUsage.inputTokens || 0;
           const outputTokens = tokenUsage.outputTokens || 0;
-          const reasoningTokens = tokenUsage.reasoningTokens || 0;
-          const cachedInputTokens = tokenUsage.cachedInputTokens || 0;
+          const reasoningTokens =
+            "reasoningTokens" in tokenUsage
+              ? Number(
+                  (tokenUsage as { reasoningTokens?: number })
+                    .reasoningTokens ?? 0,
+                )
+              : 0;
+          const cachedInputTokens =
+            "cachedInputTokens" in tokenUsage
+              ? Number(
+                  (tokenUsage as { cachedInputTokens?: number })
+                    .cachedInputTokens ?? 0,
+                )
+              : 0;
           const timeMs = tokenUsage.timeMs || 0;
 
           // Map method to metrics fields
