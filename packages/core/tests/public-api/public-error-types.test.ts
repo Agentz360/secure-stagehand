@@ -8,6 +8,8 @@ export const publicErrorTypes = {
   CaptchaTimeoutError: Stagehand.CaptchaTimeoutError,
   ConnectionTimeoutError: Stagehand.ConnectionTimeoutError,
   ContentFrameNotFoundError: Stagehand.ContentFrameNotFoundError,
+  CookieSetError: Stagehand.CookieSetError,
+  CookieValidationError: Stagehand.CookieValidationError,
   CreateChatCompletionResponseError:
     Stagehand.CreateChatCompletionResponseError,
   CuaModelRequiredError: Stagehand.CuaModelRequiredError,
@@ -61,6 +63,8 @@ export const publicErrorTypes = {
   ObserveTimeoutError: Stagehand.ObserveTimeoutError,
   ExtractTimeoutError: Stagehand.ExtractTimeoutError,
   UnderstudyCommandException: Stagehand.UnderstudyCommandException,
+  StagehandSetExtraHTTPHeadersError:
+    Stagehand.StagehandSetExtraHTTPHeadersError,
 } as const;
 
 const errorTypes = Object.keys(publicErrorTypes) as Array<
